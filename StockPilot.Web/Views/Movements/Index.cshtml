@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "Movements";
+}
+<h2 class="mb-4">Stock movements</h2>
+<div class="card-x">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0"><thead><tr><th>When</th><th>SKU</th><th>Product</th><th>Warehouse</th><th>Type</th><th class="text-end">Change</th><th>Note</th><th>By</th></tr></thead><tbody id="rows"></tbody></table>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        (async () => {
+            const m = await api('/api/stock/movements?take=100');
+            $('#rows').innerHTML = m.map(x => `<tr><td>${when(x.at)}</td><td>${esc(x.sku)}</td><td>${esc(x.product)}</td><td>${esc(x.warehouse)}</td><td>${esc(x.type)}</td>
+            <td class="text-end fw-bold ${x.delta > 0 ? 'text-success' : 'text-danger'}">${x.delta > 0 ? '+' : ''}${x.delta}</td><td>${esc(x.note ?? '')}</td><td>${esc(x.user ?? '')}</td></tr>`).join('');
+        })();
+    </script>
+}

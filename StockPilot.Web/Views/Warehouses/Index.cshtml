@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "Warehouses";
+}
+<h2 class="mb-4">Warehouses</h2>
+<div class="row g-3 mb-4" id="whs"></div>
+<div class="card-x">
+    <h5 class="mb-3">Transfer stock</h5>
+    <div class="row g-2 align-items-end">
+        <div class="col-md-3"><label class="form-label">Product</label><select id="tp" class="form-select"></select></div>
+        <div class="col-md-3"><label class="form-label">From</label><select id="tf" class="form-select"></select></div>
+        <div class="col-md-3"><label class="form-label">To</label><select id="tt" class="form-select"></select></div>
+        <div class="col-md-1"><label class="form-label">Qty</label><input id="tq" type="number" min="1" value="1" class="form-control" /></div>
+        <div class="col-md-2"><button class="btn btn-gold w-100" onclick="transfer()">Transfer</button></div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        async function load() {
+            const [w, p] = await Promise.all([api('/api/warehouses'), api('/api/products?pageSize=100')]);
+            $('#whs').innerHTML = w.map(x => `<div class="col-md-4"><div class="card-x kpi"><div class="label">🏭 ${esc(x.name)}</div><div class="value">${x.units.toLocaleString('en-IN')}</div><div class="label">units across ${x.products} products</div></div></div>`).join('');
+            const opts = w.map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join('');
+            $('#tf').innerHTML = opts; $('#tt').innerHTML = opts; if (w.length > 1) $('#tt').selectedIndex = 1;
+            $('#tp').innerHTML = p.items.map(x => `<option value="${x.id}">${esc(x.name)} (${x.total})</option>`).join('');
+        }
+        async function transfer() {
+            try {
+                await api('/api/stock/transfer', { method: 'POST', body: { productId: +$('#tp').value, fromWarehouseId: +$('#tf').value, toWarehouseId: +$('#tt').value, quantity: +$('#tq').value } });
+                toast('Transfer complete'); await load();
+            } catch (e) { toast(e.message, false); }
+        }
+        load();
+    </script>
+}

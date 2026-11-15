@@ -22,7 +22,7 @@ public class AccountController(SignInManager<IdentityUser> signIn) : Controller
 
         var result = await signIn.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: true);
         if (result.Succeeded)
-            return Url.IsLocalUrl(returnUrl) ? Redirect(returnUrl) : RedirectToAction("Index", "Products");
+            return Url.IsLocalUrl(returnUrl) ? Redirect(returnUrl) : RedirectToAction("Index", "Dashboard");
 
         ModelState.AddModelError("", result.IsLockedOut
             ? "Too many attempts. Try again in a few minutes."
