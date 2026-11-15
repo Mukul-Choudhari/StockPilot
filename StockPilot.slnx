@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
   <Project Path="StockPilot.Tests/StockPilot.Tests.csproj" />
   <Project Path="StockPilot.Web/StockPilot.Web.csproj" />
 </Solution>
