@@ -15,6 +15,7 @@ public class StockServiceTests
             .Options;
 
         var db = new AppDb(options);
+        db.Warehouses.AddRange(new Warehouse { Id = 1, Name = "A" }, new Warehouse { Id = 2, Name = "B" });
         db.Products.Add(new Product { Id = 1, Sku = "A", Name = "Item A", ReorderLevel = 10 });
         db.StockLevels.Add(new StockLevel { ProductId = 1, WarehouseId = 1, Quantity = 15 });
         db.SaveChanges();
@@ -54,5 +55,28 @@ public class StockServiceTests
         await service.AdjustAsync(1, 1, -10);          // now 5, below 10
 
         Assert.Single(await service.LowStockAsync());
+    }
+
+    [Fact]
+    public async Task Transfer_ToMissingWarehouse_IsRejected()
+    {
+        var (db, service) = Setup();
+
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => service.TransferAsync(1, 1, 99, 1));
+
+        Assert.Equal(0, db.StockMovements.Count());
+    }
+
+    [Fact]
+    public async Task Transfer_RecordsTwoMovements()
+    {
+        var (db, service) = Setup();
+
+        await service.TransferAsync(1, 1, 2, 5, "tester");
+
+        var movements = db.StockMovements.OrderBy(m => m.Id).ToList();
+        Assert.Equal(2, movements.Count);
+        Assert.Equal(MovementType.TransferOut, movements[0].Type);
+        Assert.Equal(MovementType.TransferIn, movements[1].Type);
     }
 }

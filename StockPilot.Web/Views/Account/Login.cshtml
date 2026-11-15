@@ -1,0 +1,60 @@
+﻿@model StockPilot.Web.Models.LoginViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign in – StockPilot</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+            .hero { min-height: 100vh; color: #fff; display: flex; flex-direction: column; justify-content: flex-end; padding: 4rem;
+                    background: linear-gradient(rgba(20,33,61,.8), rgba(20,33,61,.8)), url('/images/warehouse.jpg') center/cover, #14213d; }
+            .hero h1 { font-weight: 800; font-size: 2.6rem; max-width: 18ch; }
+            .panel { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+            .panel form { width: 100%; max-width: 380px; }
+            .brand { font-weight: 800; font-size: 1.5rem; color: #14213d; }
+            .btn-brand { background: #14213d; color: #fff; }
+            .btn-brand:hover { background: #1f3260; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="row g-0">
+        <div class="col-lg-7 d-none d-lg-block">
+            <div class="hero">
+                <h1>Every unit, in every warehouse.</h1>
+                <p class="mb-0">Real-time stock across locations.</p>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="panel">
+                <form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+                    <div class="brand mb-1">StockPilot</div>
+                    <p class="text-muted mb-4">Sign in to manage your inventory.</p>
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">Email</label>
+                        <input asp-for="Email" class="form-control" autocomplete="username" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label">Password</label>
+                        <input asp-for="Password" class="form-control" autocomplete="current-password" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+                    <div class="form-check mb-4">
+                        <input asp-for="RememberMe" class="form-check-input" />
+                        <label asp-for="RememberMe" class="form-check-label">Keep me signed in</label>
+                    </div>
+                    <button type="submit" class="btn btn-brand w-100 py-2">Sign in</button>
+                    <p class="text-muted small mt-4 mb-0">Demo login: admin@stockpilot.demo / Demo@12345</p>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
