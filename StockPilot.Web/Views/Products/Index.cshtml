@@ -1,0 +1,37 @@
+﻿@model List<StockPilot.Web.Data.Product>
+@{
+    ViewData["Title"] = "Inventory";
+}
+
+<h1>Inventory</h1>
+
+<table class="table">
+    <thead>
+        <tr><th>SKU</th><th>Name</th><th>On hand</th><th>Reorder at</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model)
+        {
+            var total = p.Stock.Sum(s => s.Quantity);
+            <tr>
+                <td>@p.Sku</td>
+                <td>@p.Name</td>
+                <td class="@(total < p.ReorderLevel ? "text-danger fw-bold" : "")">@total</td>
+                <td>@p.ReorderLevel</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h2>Low stock (live from the API)</h2>
+<ul id="low"></ul>
+
+<script>
+    fetch('/api/stock/low')
+        .then(r => r.json())
+        .then(items => {
+            document.getElementById('low').innerHTML = items.length
+                ? items.map(i => `<li>${i.sku}: ${i.total} left (reorder at ${i.reorderLevel})</li>`).join('')
+                : '<li>All stocked.</li>';
+        });
+</script>
