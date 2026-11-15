@@ -2,7 +2,7 @@
 
 A multi-warehouse inventory management app built with ASP.NET Core MVC, EF Core and SQL Server. It tracks stock across locations, moves units between warehouses safely, keeps a full audit trail of every change, and shows live stock insights on a dashboard.
 
-![Dashboard](docs/dashboard.png)
+![Dashboard](docs/dashboard.jpg)
 
 ## Features
 - **Login and roles:** ASP.NET Core Identity with cookie authentication, lockout on repeated failures, and Admin and Warehouse roles
