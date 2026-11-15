@@ -17,11 +17,11 @@ A multi-warehouse inventory management app built with ASP.NET Core MVC, EF Core 
 ## Screenshots
 | Login | Products |
 |---|---|
-| ![Login](docs/login.png) | ![Products](docs/products.png) |
+| ![Login](docs/login.jpg) | ![Products](docs/products.jpg) |
 
 | Warehouses | Movements |
 |---|---|
-| ![Warehouses](docs/warehouses.png) | ![Movements](docs/movements.png) |
+| ![Warehouses](docs/warehouses.jpg) | ![Movements](docs/movements.jpg) |
 
 ## Tech stack
 C#, .NET 10, ASP.NET Core MVC, Web API, Entity Framework Core (migrations), SQL Server (LocalDB), ASP.NET Core Identity, xUnit, Swagger, HTML, CSS, JavaScript (Fetch API), Bootstrap, Chart.js, Git
