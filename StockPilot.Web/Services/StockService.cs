@@ -44,8 +44,8 @@ public class StockService(AppDb db)
     }
 
     public Task<List<LowStockItem>> LowStockAsync() =>
-        db.Products
-            .Select(p => new LowStockItem(p.Sku, p.Name, p.ReorderLevel, p.Stock.Sum(s => s.Quantity)))
-            .Where(x => x.Total < x.ReorderLevel)
-            .ToListAsync();
+    db.Products
+        .Where(p => p.Stock.Sum(s => s.Quantity) < p.ReorderLevel)
+        .Select(p => new LowStockItem(p.Sku, p.Name, p.ReorderLevel, p.Stock.Sum(s => s.Quantity)))
+        .ToListAsync();
 }
