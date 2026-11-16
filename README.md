@@ -2,46 +2,48 @@
 
 A multi-warehouse inventory management app built with ASP.NET Core MVC, EF Core and SQL Server. It tracks stock across locations, moves units between warehouses safely, keeps a full audit trail of every change, and shows live stock insights on a dashboard.
 
-![Dashboard](docs/dashboard.jpg)
-
 ## Features
-- **Login and roles:** ASP.NET Core Identity with cookie authentication, lockout on repeated failures, and Admin and Warehouse roles
-- **Dashboard:** KPI cards (units, stock value, warehouses, low stock), stock-by-warehouse chart, low-stock list and recent activity
-- **Products:** search, category filter, product images, stock adjustments, and admin-only create, update and delete
-- **Warehouses:** per-location totals and stock transfers between locations
-- **Atomic transfers:** both warehouses and both history entries save together, or nothing changes
-- **Audit trail:** every adjustment and transfer is recorded with who, when, why and how much
-- **Data integrity:** foreign keys, unique SKUs, validation, and protection against deleting items that have history
+- **Login and roles**: ASP.NET Core Identity with cookie authentication, lockout on repeated failures, and Admin and Warehouse roles
+- **Dashboard**: KPI cards (units, stock value, warehouses, low stock), stock-by-warehouse chart, low-stock list and recent activity
+- **StockPilot AI Assistant**: Floating, glassmorphic chat widget powered by Google Gemini (`gemini-2.5-flash`) via the official `Google.GenAI` SDK for instant inventory and reorder assistance
+- **Products**: search, category filter, product images, stock adjustments, and admin-only create, update and delete
+- **Warehouses**: per-location totals and stock transfers between locations
+- **Atomic transfers**: both warehouses and both history entries save together, or nothing changes
+- **Audit trail**: every adjustment and transfer is recorded with who, when, why and how much
+- **Data integrity**: foreign keys, unique SKUs, validation, and protection against deleting items that have history
 - **REST API** documented with Swagger, plus unit tests for the core business rules
 
 ## Screenshots
-| Login | Products |
-|---|---|
-| ![Login](docs/login.jpg) | ![Products](docs/products.jpg) |
-
-| Warehouses | Movements |
-|---|---|
-| ![Warehouses](docs/warehouses.jpg) | ![Movements](docs/movements.jpg) |
+Login | Products  
+Warehouses | Movements
 
 ## Tech stack
-C#, .NET 10, ASP.NET Core MVC, Web API, Entity Framework Core (migrations), SQL Server (LocalDB), ASP.NET Core Identity, xUnit, Swagger, HTML, CSS, JavaScript (Fetch API), Bootstrap, Chart.js, Git
+C#, .NET 10, ASP.NET Core MVC, Web API, Entity Framework Core (migrations), SQL Server (LocalDB), ASP.NET Core Identity, Google Gemini API (`Google.GenAI`), xUnit, Swagger, HTML, CSS, JavaScript (Fetch API), Bootstrap, Chart.js, Git
 
 ## API overview
+
 | Method | Endpoint | Description | Access |
-|---|---|---|---|
-| GET | `/api/products` | List products (search, category, paging) | Signed in |
-| GET | `/api/products/{id}` | Product with stock per warehouse | Signed in |
-| POST / PUT / DELETE | `/api/products` | Create, update, delete products | Admin |
-| GET | `/api/warehouses` | Warehouses with totals | Signed in |
-| POST / PUT / DELETE | `/api/warehouses` | Manage warehouses | Admin |
-| POST | `/api/stock/adjust` | Add or remove stock with a note | Signed in |
-| POST | `/api/stock/transfer` | Move stock between warehouses | Signed in |
-| GET | `/api/stock/movements` | Audit trail of stock changes | Signed in |
-| GET | `/api/stock/low` | Items below their reorder level | Signed in |
-| GET | `/api/dashboard/stats` | Dashboard figures | Signed in |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/products` | List products (search, category, paging) | Signed in |
+| `GET` | `/api/products/{id}` | Product with stock per warehouse | Signed in |
+| `POST / PUT / DELETE` | `/api/products` | Create, update, delete products | Admin |
+| `GET` | `/api/warehouses` | Warehouses with totals | Signed in |
+| `POST / PUT / DELETE` | `/api/warehouses` | Manage warehouses | Admin |
+| `POST` | `/api/stock/adjust` | Add or remove stock with a note | Signed in |
+| `POST` | `/api/stock/transfer` | Move stock between warehouses | Signed in |
+| `GET` | `/api/stock/movements` | Audit trail of stock changes | Signed in |
+| `GET` | `/api/stock/low` | Items below their reorder level | Signed in |
+| `GET` | `/api/dashboard/stats` | Dashboard figures | Signed in |
+| `POST` | `/api/ai/chat` | Send natural-language queries to StockPilot AI | Signed in |
 
-Responses use clear status codes: 400 for invalid input or insufficient stock, 404 for a missing product or warehouse, 409 for a duplicate SKU, 401 when not signed in.
+Responses use clear status codes: `400` for invalid input or insufficient stock, `404` for a missing product or warehouse, `409` for a duplicate SKU, `401` when not signed in.
 
+## Run it locally
+1. Install the .NET 10 SDK and Visual Studio with the **ASP.NET and web development** workload (includes LocalDB).
+2. Clone the repo and open `StockPilot.sln`.
+3. Configure your free [Google AI Studio](https://aistudio.google.com/) API key via .NET User Secrets (or environment variable `GEMINI_API_KEY`):
+   ```shell
+   dotnet user-secrets set "Gemini:ApiKey" "YOUR_GEMINI_API_KEY" --project StockPilot.Web
 ## Run it locally
 1. Install the .NET 10 SDK and Visual Studio with the **ASP.NET and web development** workload (includes LocalDB).
 2. Clone the repo and open `StockPilot.sln`.
