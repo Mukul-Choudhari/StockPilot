@@ -3,12 +3,15 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using StockPilot.Web.Data;
 using StockPilot.Web.Services;
+using Google.GenAI;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Database configuration
 builder.Services.AddDbContext<AppDb>(o =>
     o.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
+// Identity configuration
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(o => o.Password.RequiredLength = 8)
     .AddEntityFrameworkStores<AppDb>()
     .AddDefaultTokenProviders();
@@ -28,7 +31,21 @@ builder.Services.ConfigureApplicationCookie(o =>
     };
 });
 
+// Application Services
 builder.Services.AddScoped<StockService>();
+
+// --- REGISTER GOOGLE GEMINI CLIENT ---
+builder.Services.AddSingleton<Client>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    // Pulls from appsettings.json ("Gemini:ApiKey") or Environment Variables ("GEMINI_API_KEY")
+    string apiKey = configuration["Gemini:ApiKey"]
+                    ?? Environment.GetEnvironmentVariable("GEMINI_API_KEY")
+                    ?? throw new InvalidOperationException("Gemini API key is not configured.");
+    return new Client(apiKey: apiKey);
+});
+// -------------------------------------
+
 // Every controller requires login unless marked [AllowAnonymous]
 builder.Services.AddControllersWithViews(o => o.Filters.Add(new AuthorizeFilter()));
 builder.Services.AddEndpointsApiExplorer();
@@ -36,6 +53,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Database migration and seeding
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDb>();
@@ -103,12 +121,10 @@ if (!app.Environment.IsDevelopment())
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapStaticAssets();
 app.MapControllers();
 app.MapControllerRoute(
