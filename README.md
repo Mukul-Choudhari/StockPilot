@@ -1,6 +1,7 @@
 # StockPilot
 
 A multi-warehouse inventory management app built with ASP.NET Core MVC, EF Core and SQL Server. It tracks stock across locations, moves units between warehouses safely, keeps a full audit trail of every change, and shows live stock insights on a dashboard.
+
 ![StockPilot Dashboard](docs/dashboard.jpg)
 
 ## Features
