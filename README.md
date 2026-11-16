@@ -14,8 +14,14 @@ A multi-warehouse inventory management app built with ASP.NET Core MVC, EF Core 
 - **REST API** documented with Swagger, plus unit tests for the core business rules
 
 ## Screenshots
-Login | Products  
-Warehouses | Movements
+
+| Login | Products |
+| :---: | :---: |
+| ![Login](docs/login.jpg) | ![Products](docs/products.jpg) |
+
+| Warehouses | Movements |
+| :---: | :---: |
+| ![Warehouses](docs/warehouses.jpg) | ![Movements](docs/movements.jpg) |
 
 ## Tech stack
 C#, .NET 10, ASP.NET Core MVC, Web API, Entity Framework Core (migrations), SQL Server (LocalDB), ASP.NET Core Identity, Google Gemini API (`Google.GenAI`), xUnit, Swagger, HTML, CSS, JavaScript (Fetch API), Bootstrap, Chart.js, Git
