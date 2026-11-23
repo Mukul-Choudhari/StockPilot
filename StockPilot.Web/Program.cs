@@ -19,8 +19,11 @@ if (!string.IsNullOrWhiteSpace(port))
 var connectionString = builder.Configuration.GetConnectionString("Default")
                        ?? Environment.GetEnvironmentVariable("ConnectionStrings__Default");
 
-var isLocalDb = connectionString?.Contains("(localdb)", StringComparison.OrdinalIgnoreCase) ?? false;
-var hasRemoteSql = !string.IsNullOrWhiteSpace(connectionString) && !isLocalDb;
+var isLocalDb = string.IsNullOrWhiteSpace(connectionString)
+                || connectionString.Contains("localdb", StringComparison.OrdinalIgnoreCase)
+                || connectionString.Contains("attachdbfilename", StringComparison.OrdinalIgnoreCase);
+
+var hasRemoteSql = !isLocalDb;
 
 if (hasRemoteSql)
 {
@@ -28,9 +31,9 @@ if (hasRemoteSql)
 }
 else
 {
-    // Non-LocalDB placeholder provider so DI builds cleanly on Linux even before a cloud SQL DB is connected
+    // Safe non-LocalDB placeholder string so AddDbContext doesn't fail on Linux during UI/smoke checks
     builder.Services.AddDbContext<AppDb>(o =>
-        o.UseSqlServer("Server=localhost,1433;Database=StockPilotDemo;User Id=sa;Password=Placeholder_Password_123!;TrustServerCertificate=True;"));
+        o.UseSqlServer("Server=127.0.0.1,1433;Database=StockPilotDemo;User Id=sa;Password=Placeholder_Password_123!;TrustServerCertificate=True;"));
 }
 
 // Identity configuration
