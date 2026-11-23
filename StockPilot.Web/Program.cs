@@ -19,13 +19,18 @@ if (!string.IsNullOrWhiteSpace(port))
 var connectionString = builder.Configuration.GetConnectionString("Default")
                        ?? Environment.GetEnvironmentVariable("ConnectionStrings__Default");
 
-if (!string.IsNullOrWhiteSpace(connectionString))
+var isLocalDb = connectionString?.Contains("(localdb)", StringComparison.OrdinalIgnoreCase) ?? false;
+var hasRemoteSql = !string.IsNullOrWhiteSpace(connectionString) && !isLocalDb;
+
+if (hasRemoteSql)
 {
     builder.Services.AddDbContext<AppDb>(o => o.UseSqlServer(connectionString));
 }
 else
 {
-    builder.Services.AddDbContext<AppDb>(o => o.UseSqlServer());
+    // Non-LocalDB placeholder provider so DI builds cleanly on Linux even before a cloud SQL DB is connected
+    builder.Services.AddDbContext<AppDb>(o =>
+        o.UseSqlServer("Server=localhost,1433;Database=StockPilotDemo;User Id=sa;Password=Placeholder_Password_123!;TrustServerCertificate=True;"));
 }
 
 // Identity configuration
@@ -57,7 +62,12 @@ builder.Services.AddSingleton<Client>(sp =>
     var configuration = sp.GetRequiredService<IConfiguration>();
     string apiKey = configuration["Gemini:ApiKey"]
                     ?? Environment.GetEnvironmentVariable("GEMINI_API_KEY")
-                    ?? throw new InvalidOperationException("Gemini API key is not configured.");
+                    ?? string.Empty;
+
+    // Only throw if someone actually calls an endpoint/service that requires the Gemini Client
+    if (string.IsNullOrWhiteSpace(apiKey))
+        throw new InvalidOperationException("Gemini API key is not configured. Set GEMINI_API_KEY in environment variables.");
+
     return new Client(apiKey: apiKey);
 });
 // -------------------------------------
@@ -69,8 +79,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Database migration and seeding (safe guard if DB isn't configured yet during initial smoke test)
-if (!string.IsNullOrWhiteSpace(connectionString))
+// Run migrations and seeding only when a real remote SQL connection string is configured
+if (hasRemoteSql)
 {
     using var scope = app.Services.CreateScope();
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
@@ -148,6 +158,10 @@ if (!string.IsNullOrWhiteSpace(connectionString))
         logger.LogError(ex, "Database migration or seeding failed during startup.");
         throw;
     }
+}
+else
+{
+    app.Logger.LogWarning("Skipping startup DB migration/seeding because no non-LocalDB connection string is configured.");
 }
 
 if (!app.Environment.IsDevelopment())
